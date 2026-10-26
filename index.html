@@ -7,26 +7,10 @@
         body{font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;color:white;}
         h1{font-size: 60px;-webkit-text-stroke:2.5px black;}
     </style>
-    <title>Delicious Valley Website</title>
+    <title>Not Delicious Valley Website</title>
 </head>
 <body>
     <img src="/favicon.ico">
-    <h1>HAHAHA NORMAL MAP</h1>
-    <button onclick="getUsername()">Получить имя</button>
+    <h1>Looking for something?</h1>
 </body>
-<script>
-function getUsername() {
-    fetch("/api", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(["players","select","c72acd0be9fe2dc8af9a804bebde17e1226e0e1f38b3bdd7452af088769d371b8ef1e1b7401949484b1de87a07fea391d5d1","username"])
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data)
-    })
-}
-</script>
 </html>
