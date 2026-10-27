@@ -64,16 +64,12 @@ async def pl(request: Request, db = Depends(get_db)):
                             else:
                                 return JSONResponse(content={"denied":"too short username"}, status_code=403)
                             await cursor.execute("SELECT * FROM players")
-                            dbs = await cursor.fetchone()
                             while True:
                                 token = secrets.token_hex(16)
                                 try:
                                     async with db.transaction():
                                         async with db.cursor() as cursor:
-                                            if dbs is None:
-                                                await cursor.execute("INSERT INTO players (id,token,username,origname,password,email,trust_in) VALUES(%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(username) DO NOTHING",(0,token,data[1],data[1],ph.hash(data[2]),data[3],7))
-                                            else:
-                                                await cursor.execute("INSERT INTO players (token,username,origname,password,email,trust_in) VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT(username) DO NOTHING",(token,data[1],data[1],ph.hash(data[2]),data[3],7))
+                                            await cursor.execute("INSERT INTO players (token,username,origname,password,email,trust_in) VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT(username) DO NOTHING",(token,data[1],data[1],ph.hash(data[2]),data[3],7))
                                             if cursor.rowcount == 0:
                                                 return JSONResponse(content={"ok":"busy"}, status_code=409)
                                             else:
@@ -179,7 +175,7 @@ async def pl(request: Request, db = Depends(get_db)):
                                 pshash = await cursor.fetchone()
                                 try:
                                     if not pshash is None:
-                                        if type(pshash[0]) == str:
+                                        if type(pshash[0]) == str and type(data[2]) == str:
                                             ph.verify(pshash[0],data[2])
                                         else:
                                             return JSONResponse(content={"error":"Invalid request"}, status_code=400)
@@ -348,7 +344,7 @@ async def cfl(websocket: WebSocket, token: str, room: str):
                                             if connections[room][x]["websocket"] != websocket:
                                                 await connections[room][x]["websocket"].send_json({"message":[name,data[2]]})
                                     elif data[1] == "view":
-                                        
+                                       await cursor.execute("SELECT * FROM chat WHERE room_name = %s ",(room,name)) 
                                 elif data[0] == "field":
                                     if len(data) != 3:
                                         await websocket.send_json({"error":"Invalid format"})
